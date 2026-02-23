@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Online Store Assistant</title>
+  <link rel="stylesheet" href="../project/css/style.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="chat-shell" aria-label="Chatbot">
+      
+      <header class="chat-header">
+        <div class="title">
+          <h1>Online Store Assistant</h1>
+          <p>Simple FAQ Chatbot (Rule-based)</p>
+        </div>
+        <button id="btnReset" class="btn secondary" type="button" aria-label="Restart chat">
+          Restart
+        </button>
+      </header>
+
+      <div id="chat" class="chat" role="log" aria-live="polite" aria-relevant="additions"></div>
+
+      <div class="chat-input">
+        <input
+          id="userInput"
+          type="text"
+          placeholder='Type a message or click a button (e.g., "delivery time")'
+          autocomplete="off"
+        />
+        <button id="btnSend" class="btn primary" type="button" aria-label="Send message">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+
+      <footer class="chat-footer">
+        <small>
+          Tip: Use the buttons for a faster flow. If the chatbot can’t understand, it shows a fallback message.
+        </small>
+      </footer>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
