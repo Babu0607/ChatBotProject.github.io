@@ -21,11 +21,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push imagem
+      - name: Build e Push da imagem
         uses: docker/build-push-action@v5
         with:
-          context: ./project
-          file: ./Dockerfile
+          context: .
           push: true
           tags: luan755/chatbot:latest
           # Isso aqui ajuda a acelerar os próximos builds
