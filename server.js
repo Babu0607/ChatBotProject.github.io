@@ -3,10 +3,8 @@ const path = require('path');
 const app = express();
 const PORT = 8080;
 
-// Serve os arquivos estáticos (HTML, CSS, JS, Imagens)
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '.')));
 
-// Rota principal para abrir o index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
