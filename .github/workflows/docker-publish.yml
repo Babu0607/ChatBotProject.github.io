@@ -18,6 +18,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Necessário para construir imagens para o Mac (ARM64)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -26,7 +30,8 @@ jobs:
         with:
           context: .
           push: true
+          # Define as duas plataformas: PC comum (amd64) e seu Mac (arm64)
+          platforms: linux/amd64,linux/arm64
           tags: luan755/chatbot:latest
-          # Isso aqui ajuda a acelerar os próximos builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
