@@ -1,2 +1,9 @@
+# ignore dependece folder 
 node_modules/
+
+# Some (Mac/Windows) trash files
 .DS_Store
+Thumbs.db
+
+# ignore errors logs
+npm-debug.log*
