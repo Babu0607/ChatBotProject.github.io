@@ -1,5 +1,5 @@
 console.log("Hello WebChat.");
-
+// remove this comment
 const chatEl = document.getElementById("chat");
 const inputEl = document.getElementById("userInput");
 const sendBtn = document.getElementById("btnSend");
@@ -109,7 +109,7 @@ function renderMessage(sender, text) {
     <div class="bubble">${escapeHtml(text)}</div>
     ${sender === "user" ? `<img class="avatar" src="${avatarSrc}">` : ""}
   `;
-
+  
   chatEl.appendChild(msg);
   chatEl.scrollTo({ top: chatEl.scrollHeight, behavior: 'smooth' });
 }
