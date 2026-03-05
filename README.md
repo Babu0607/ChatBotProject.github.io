@@ -5,4 +5,3 @@
 * **User Input Fix:** Resolved the previous bug affecting user input processing.
 * **Dynamic Scalability:** Achieved full integration for topics and questions. You can now add new content directly to the JSON file without needing to modify the source code.
 * **Error Handling:** Implemented robust error handling for typos. If a user makes a mistake, the system will now prompt them to retry within the current topic instead of restarting the entire flow.
-* **Message Duplication Fix:** Squashed the bug that was causing duplicate messages in the interface.

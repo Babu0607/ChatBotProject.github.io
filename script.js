@@ -141,7 +141,8 @@ async function handleCategory(categoryId) {
   state.currentCategoryId = categoryId;
   const cat = appData.categories[categoryId];
 
-  // Log user choice and bot response
+  // Log user choice and bot response)
+  
   await addMessage("user", cat.title);
   await addMessage("bot", `Here are the questions for ${cat.title}:`, 1000);
 
@@ -154,9 +155,10 @@ async function handleCategory(categoryId) {
   // Append a navigation button to allow users to switch topics easily
   btns.push({ 
     label: "Other Topics", 
-    onClick: () => {
-       addMessage("bot", "What Can I Help You With?", 800);
+    onClick: async () => {
+       await addMessage("bot", "What Can I Help You With?", 800);
        showMainMenu(); 
+       state.currentCategoryId = null; // Reset category context to allow new selection
     } 
   });
   
@@ -186,6 +188,7 @@ async function askContinue() {
 // Ends the conversation flow
 async function endChat() {
   state.waitingForContinue = false;
+  state.currentCategoryId = null;
   await addMessage("bot", "Thanks! Have a great day! 😊", 1000);
 }
 
@@ -196,7 +199,7 @@ async function handleTypedMessage(rawText) {
   if (!text) return; // Exit if the input is empty or just spaces
 
   // Display the user's typed message in the chat UI
-  //await addMessage("user", rawText);<-- This line is currently commented out to avoid duplication with button clicks
+  await addMessage("user", rawText);
   
   // KEYWORD MATCHING LOGIC
   // Case 1: The user is at the Root level (No category selected yet)
@@ -232,6 +235,7 @@ async function handleTypedMessage(rawText) {
   }
   else if (text.includes("other") || text.includes("topic")) {
     await addMessage("bot", "Please choose a topic below so I can help you!", 1000);
+    state.currentCategoryId = null; // Reset category context to allow new selection
     showMainMenu();
   }
   else {
