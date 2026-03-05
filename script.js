@@ -1,84 +1,44 @@
+// Logs an initial message for debugging purposes
 console.log("Hello WebChat.");
-// remove this comment
-const chatEl = document.getElementById("chat");
-const inputEl = document.getElementById("userInput");
-const sendBtn = document.getElementById("btnSend");
-const resetBtn = document.getElementById("btnReset");
 
-const SUPPORT_INFO = "You can contact us at support@store.com or call +353 123 4567 during business hours (Mon–Fri, 9:00–17:00).";
+// DOM element selection for chat interaction
+const chatEl = document.getElementById("chat");       // The container where messages are rendered
+const inputEl = document.getElementById("userInput"); // The text input field
+const sendBtn = document.getElementById("btnSend");   // The submit button
+const resetBtn = document.getElementById("btnReset"); // The restart/clear button
 
-const DATA = {
-  mainMenu: [
-    { id: "delivery", label: "Delivery" },
-    { id: "returns", label: "Returns" },
-    { id: "size", label: "Size Guide" },
-    { id: "orders", label: "Orders" },
-    { id: "payments", label: "Payments" },
-    { id: "contact", label: "Contact Support" },
-  ],
+// Knowledge base containing the menu structure, categories, and specific Q&As
+//  Global variable to store JSON data
+let appData = null;
 
-  categories: {
-    delivery: {
-      title: "Delivery",
-      questions: [
-        { id: "del_time", label: "What is the delivery time?", answer: "Delivery usually takes 3–5 business days." },
-        { id: "free_ship", label: "Do you offer free shipping?", answer: "Yes, we offer free shipping on orders over €50." },
-        { id: "track_order", label: "How can I track my order?", answer: "You can track your order using the tracking link sent to your email." },
-        { id: "intl_ship", label: "Do you ship internationally?", answer: "Yes, we ship to over 50 countries! International delivery takes 7–14 business days." }
-      ]
-    },
-    returns: {
-      title: "Returns & Refunds",
-      questions: [
-        { id: "return_item", label: "How can I return an item?", answer: "You can return items within 14 days. Please fill out the form on our site." },
-        { id: "refund_time", label: "When will I receive my refund?", answer: "Refunds are processed within 5 business days after receipt." },
-        { id: "exchange_item", label: "Can I exchange an item?", answer: "Yes! Request an exchange through our return portal within 14 days." }
-      ]
-    },
-    size: {
-      title: "Size Guide",
-      questions: [
-        { id: "know_size", label: "How do I know my size?", answer: "Check our size guide available on each product page." },
-        { id: "between_sizes", label: "What if I'm between sizes?", answer: "We recommend sizing up for a more comfortable fit." }
-      ]
-    },
-    orders: {
-      title: "Orders",
-      questions: [
-        { id: "cancel_order", label: "Can I cancel my order?", answer: "Orders can be cancelled within 1 hour after purchase." },
-        { id: "change_address", label: "Can I change my shipping address?", answer: "Contact us within 1 hour of ordering to update your details." }
-      ]
-    },
-    payments: {
-      title: "Payments",
-      questions: [
-        { id: "methods", label: "What payment methods do you accept?", answer: "We accept Visa, MasterCard, PayPal, and Apple Pay." },
-        { id: "installments", label: "Can I pay in installments?", answer: "We are currently working on adding installment options soon!" }
-      ]
-    },
-    contact: {
-      title: "Contact Support",
-      questions: [
-        { id: "contact_how", label: "How can I contact support?", answer: SUPPORT_INFO },
-        { id: "store_location", label: "Do you have physical stores?", answer: "We are 100% online. Our HQ is in Dublin, Ireland." }
-      ]
-    }
-  }
+//  Main function to load data before starting the chat
+async function LoadChatData() {
+  try {
+    const response = await fetch("./questionsData.json");
+    appData = await response.json(); // Store JSON content in the global variable
     
-};
+  } catch (error) {
+    console.error("Failed to load chat data:", error);
+  }
+}
 
+// State management to track the current conversation context
 let state = {
   currentCategoryId: null,
   waitingForContinue: false
 };
 
+// Helper function to sanitize strings and prevent XSS (Cross-Site Scripting)
 function escapeHtml(str) {
   return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
 // --- The Core Messaging Engine ---
+
+// Handles the logic of adding messages to the chat, including simulated typing delays
 async function addMessage(sender, text, delay = 0) {
   if (sender === "bot" && delay > 0) {
+    // Create and show a typing indicator (the three dots animation)
     const indicator = document.createElement("div");
     indicator.className = "msg bot typing-indicator";
     indicator.innerHTML = `
@@ -88,22 +48,26 @@ async function addMessage(sender, text, delay = 0) {
     chatEl.appendChild(indicator);
     chatEl.scrollTop = chatEl.scrollHeight;
 
+    // Pause execution to simulate the bot "thinking/typing"
     await new Promise(resolve => setTimeout(resolve, delay));
-    indicator.remove();
+    indicator.remove(); // Remove indicator once the delay is over
   } 
   
   if (sender === "user") {
+    // Slight delay for user messages to make transitions smoother
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   renderMessage(sender, text);
 }
 
+// Injects the message HTML into the DOM and handles the layout (avatars, bubbles)
 function renderMessage(sender, text) {
   const msg = document.createElement("div");
   msg.className = `msg ${sender}`;
   const avatarSrc = sender === "bot" ? "images/bot.png" : "images/user.png";
   
+  // Set the inner HTML based on whether the sender is the bot or the user
   msg.innerHTML = `
     ${sender === "bot" ? `<img class="avatar" src="${avatarSrc}">` : ""}
     <div class="bubble">${escapeHtml(text)}</div>
@@ -111,9 +75,11 @@ function renderMessage(sender, text) {
   `;
   
   chatEl.appendChild(msg);
+  // Auto-scroll to the bottom of the chat with a smooth animation
   chatEl.scrollTo({ top: chatEl.scrollHeight, behavior: 'smooth' });
 }
 
+// Dynamically generates and displays clickable action buttons in the chat area
 function addButtons(buttons) {
   const wrap = document.createElement("div");
   wrap.className = "quick-actions";
@@ -132,6 +98,8 @@ function addButtons(buttons) {
 }
 
 // --- App Logic ---
+
+// Initializes the chat, clears history, and shows the initial welcome button
 async function showWelcome() {
   state.currentCategoryId = null;
   state.waitingForContinue = false;
@@ -151,37 +119,43 @@ async function showWelcome() {
   ]);
 }
 
+// Lists the main categories from the global appData as buttons
 function showMainMenu() {
-  // REMOVE: chatEl.innerHTML = ""; <--- Delete this line if it's there!
-  
-  const btns = DATA.mainMenu.map((item) => ({
+  if (!appData) {
+    console.error("Menu data not found. Ensure LoadChatData finished successfully.");
+    return;
+  }
+
+  // Use .map to transform each JSON item into a button object
+  const btns = appData.mainMenu.map((item) => ({
     label: item.label,
     onClick: () => handleCategory(item.id)
   }));
+
+  // Call addButtons once with the complete list
   addButtons(btns);
 }
 
-
+// Handles the transition when a user selects a main category (e.g., Returns)
 async function handleCategory(categoryId) {
   state.currentCategoryId = categoryId;
-  const cat = DATA.categories[categoryId];
+  const cat = appData.categories[categoryId];
 
-  //Add the user's choice to the history
+  // Log user choice and bot response
   await addMessage("user", cat.title);
-  
-  //Add the bot's response below it
   await addMessage("bot", `Here are the questions for ${cat.title}:`, 1000);
 
+  // Map category questions to buttons
   const btns = cat.questions.map((q) => ({
     label: q.label,
     onClick: () => handleQuestion(categoryId, q.id)
   }));
 
-  // Add a "Main Menu" button so they can switch topics without a reset
+  // Append a navigation button to allow users to switch topics easily
   btns.push({ 
     label: "Other Topics", 
     onClick: () => {
-       addMessage("bot", "What else can I help with?");
+       addMessage("bot", "What Can I Help You With?", 800);
        showMainMenu(); 
     } 
   });
@@ -189,8 +163,9 @@ async function handleCategory(categoryId) {
   addButtons(btns);
 }
 
+// Retrieves and displays the answer for a specific question ID
 async function handleQuestion(categoryId, questionId) {
-  const cat = DATA.categories[categoryId];
+  const cat = appData.categories[categoryId];
   const q = cat.questions.find((x) => x.id === questionId);
 
   await addMessage("user", q.label);
@@ -198,6 +173,7 @@ async function handleQuestion(categoryId, questionId) {
   await askContinue();
 }
 
+// Prompts the user to decide if they want to keep chatting or stop
 async function askContinue() {
   state.waitingForContinue = true;
   await addMessage("bot", "Do you need help with anything else?", 800);
@@ -207,36 +183,73 @@ async function askContinue() {
   ]);
 }
 
+// Ends the conversation flow
 async function endChat() {
   state.waitingForContinue = false;
   await addMessage("bot", "Thanks! Have a great day! 😊", 1000);
 }
 
+// Processes manual text input by matching keywords against the available categories
 async function handleTypedMessage(rawText) {
+  // Normalize input: convert to lowercase and remove leading/trailing whitespace
   const text = (rawText || "").toLowerCase().trim();
-  if (!text) return;
+  if (!text) return; // Exit if the input is empty or just spaces
 
-  await addMessage("user", rawText);
-
-  //Expanded Keyword matching
-  if (text.includes("delivery") || text.includes("ship")) { await handleCategory("delivery"); return; }
-  if (text.includes("return") || text.includes("refund") || text.includes("exchange")) { await handleCategory("returns"); return; }
-  if (text.includes("size") || text.includes("fit")) { await handleCategory("size"); return; }
-  if (text.includes("order") || text.includes("address")) { await handleCategory("orders"); return; }
-  if (text.includes("pay") || text.includes("visa") || text.includes("money")) { await handleCategory("payments"); return; }
-  if (text.includes("contact") || text.includes("support") || text.includes("location")) { await handleCategory("contact"); return; }
+  // Display the user's typed message in the chat UI
+  //await addMessage("user", rawText);<-- This line is currently commented out to avoid duplication with button clicks
   
-  await addMessage("bot", "I'm not sure I understand. Try picking a topic below!", 1000);
-  showMainMenu();
+  // KEYWORD MATCHING LOGIC
+  // Case 1: The user is at the Root level (No category selected yet)
+  if (state.currentCategoryId == null) {
+    // Check for broad keywords to trigger specific category flows
+    if (text.includes("delivery") || text.includes("ship")) { await handleCategory("delivery"); return; }
+    if (text.includes("return") || text.includes("refund") || text.includes("exchange")) { await handleCategory("returns"); return; }
+    if (text.includes("size") || text.includes("fit")) { await handleCategory("size"); return; }
+    if (text.includes("order") || text.includes("address")) { await handleCategory("orders"); return; }
+    if (text.includes("pay") || text.includes("visa") || text.includes("money")) { await handleCategory("payments"); return; }
+    if (text.includes("contact") || text.includes("support") || text.includes("location")) { await handleCategory("contact"); return; }
+  }
+  // Case 2: The user is already inside a specific category (Context-aware search)
+  else {
+    // Retrieve the current category data from the global object
+    const cat = appData.categories[state.currentCategoryId];
+    
+    // Attempt to find a question within this category that matches the typed text
+    // It compares the user's input against the labels defined in the JSON
+    const matchedQuestion = cat.questions.find(q => text.includes(q.label.toLowerCase()));
+    
+    if (matchedQuestion) {
+      // If a match is found, trigger the question handler automatically
+      await handleQuestion(state.currentCategoryId, matchedQuestion.id);
+      return;
+    }
+  }
+  
+  // Default fallback if no keywords match
+  if (state.currentCategoryId == null) {
+    await addMessage("bot", "Hi!, Please choose a topic so I can help you!", 1000);
+    showMainMenu(); // Redirect to main menu if no category is selected
+  }
+  else if (text.includes("other") || text.includes("topic")) {
+    await addMessage("bot", "Please choose a topic below so I can help you!", 1000);
+    showMainMenu();
+  }
+  else {
+    await addMessage("bot", "I'm not sure I understand. You may have typed something incorrectly.", 1000);
+    handleCategory(state.currentCategoryId);
+  }
 }
 
+// Attaches event listeners to the UI elements (Button clicks and keyboard 'Enter')
 function wireEvents() {
+  // Submit button click listener
   sendBtn.addEventListener("click", async () => {
     const v = inputEl.value;
     inputEl.value = "";
     await handleTypedMessage(v);
   });
 
+  // Keyboard 'Enter' key listener
   inputEl.addEventListener("keydown", async (e) => {
     if (e.key === "Enter") {
       const v = inputEl.value;
@@ -245,10 +258,14 @@ function wireEvents() {
     }
   });
 
+  // Reset button click listener with confirmation dialog
   resetBtn.addEventListener("click", () => {
     if (confirm("Are you sure you would like to restart chat?")) showWelcome();
   });
 }
 
-wireEvents();
-showWelcome();
+// Execution Start
+LoadChatData().then(() => {
+  wireEvents();
+  showWelcome();
+});
