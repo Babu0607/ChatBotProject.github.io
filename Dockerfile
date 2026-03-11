@@ -1,4 +1,4 @@
-FROM node:24.0.0-alpine
+FROM node:24.14.0-trixie-slim
 WORKDIR /app
 
 # Copy the files that are now in the root directory
