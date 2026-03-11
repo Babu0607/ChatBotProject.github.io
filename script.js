@@ -250,7 +250,7 @@ async function handleQuestion(categoryId, questionId, fromButton = false) {
   await addMessage("bot", q.answer, 1200);
   await askContinue(categoryId);
 }
-
+//
 async function askContinue(categoryId) {
   state.waitingForContinue = true;
   await addMessage("bot", "Do you need help with anything else?", 800);
