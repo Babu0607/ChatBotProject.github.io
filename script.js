@@ -97,7 +97,7 @@ function updateTimer() {
 
 // Start timer and update every second
 function startTimer() {
-  updateTimer(); // Initial update
+  updateTimer(); 
   setInterval(updateTimer, 1000); // Update every second
 }
 
@@ -287,7 +287,7 @@ async function handleTypedMessage(rawText) {
   if (state.currentCategoryId) {
     const currentCategory = DATA.categories[state.currentCategoryId];
     
-    // Check for matches with question labels
+    //labels check for matching questions
     const matchedQuestion = currentCategory.questions.find(q => 
       q.label.toLowerCase() === text || 
       text.includes(q.label.toLowerCase()) ||
