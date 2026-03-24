@@ -1,0 +1,58 @@
+{
+    "mainMenu": [
+        { "id": "delivery", "label": "Delivery"},
+        { "id": "returns", "label": "Returns"},
+        { "id": "size", "label": "Size Guide"},
+        { "id": "orders", "label": "Orders"},
+        { "id": "payments", "label": "Payments"},
+        { "id": "contact", "label": "Contact Support"}
+    ],
+
+    "categories": {
+        "delivery": {
+          "title": "Delivery",
+          "questions": [
+            { "id": "del_time", "label": "What is the delivery time?", "answer": "Delivery usually takes 3–5 business days." },
+            { "id": "free_ship", "label": "Do you offer free shipping?", "answer": "Yes, we offer free shipping on orders over €50." },
+            { "id": "track_order", "label": "How can I track my order?", "answer": "You can track your order using the tracking link sent to your email." },
+            { "id": "intl_ship", "label": "Do you ship internationally?", "answer": "Yes, we ship to over 50 countries! International delivery takes 7–14 business days." }
+          ]
+        },
+        "returns": {
+          "title": "Returns & Refunds",
+          "questions": [
+            { "id": "return_item", "label": "How can I return an item?", "answer": "You can return items within 14 days. Please fill out the form on our site." },
+            { "id": "refund_time", "label": "When will I receive my refund?", "answer": "Refunds are processed within 5 business days after receipt." },
+            { "id": "exchange_item", "label": "Can I exchange an item?", "answer": "Yes! Request an exchange through our return portal within 14 days." }
+          ]
+        },
+        "size": {
+          "title": "Size Guide",
+          "questions": [
+            { "id": "know_size", "label": "How do I know my size?", "answer": "Check our size guide available on each product page." },
+            { "id": "between_sizes", "label": "What if I'm between sizes?", "answer": "We recommend sizing up for a more comfortable fit." }
+          ]
+        },
+        "orders": {
+          "title": "Orders",
+          "questions": [
+            { "id": "cancel_order", "label": "Can I cancel my order?", "answer": "Orders can be cancelled within 1 hour after purchase." },
+            { "id": "change_address", "label": "Can I change my shipping address?", "answer": "Contact us within 1 hour of ordering to update your details." }
+          ]
+        },
+        "payments": {
+          "title": "Payments",
+          "questions": [
+            { "id": "methods", "label": "What payment methods do you accept?", "answer": "We accept Visa, MasterCard, PayPal, and Apple Pay." },
+            { "id": "installments", "label": "Can I pay in installments?", "answer": "We are currently working on adding installment options soon!" }
+          ]
+        },
+        "contact": {
+          "title": "Contact Support",
+          "questions": [
+            { "id": "contact_how", "label": "How can I contact support?", "answer": "You can contact us at support@store.com or call +353 123 4567 during business hours (Mon–Fri, 9:00–17:00)."},
+            { "id": "store_location", "label": "Do you have physical stores?", "answer": "We are 100% online. Our HQ is in Dublin, Ireland." }
+          ]
+        }
+      }
+}
