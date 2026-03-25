@@ -3,10 +3,27 @@ name: Build and Push Node.js Docker Image
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  test:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+
+  build-and-push:
+    needs: test
+    if: github.ref == 'refs/heads/main' 
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout do código
@@ -18,7 +35,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Necessário para construir imagens para o Mac (ARM64)
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -30,8 +46,9 @@ jobs:
         with:
           context: .
           push: true
-          # Define as duas plataformas: PC comum (amd64) e seu Mac (arm64)
           platforms: linux/amd64,linux/arm64
-          tags: luan755/chatbot:latest
+          tags: |
+            luan755/chatbot:latest
+            luan755/chatbot:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
