@@ -6,30 +6,50 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-      - run: npm ci
-      - run: npm test
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
 
       - name: Notify failure on Slack
         if: failure()
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
-            { "text": "❌ *CI failed!* Tests broke on job `test`" }
+            {
+              "text": "❌ *CI failed!* Os testes quebraram no repositório ${{ github.repository }}",
+              "attachments": [{
+                "color": "danger",
+                "fields": [
+                  { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
+                  { "title": "Author", "value": "${{ github.actor }}", "short": true }
+                ]
+              }]
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   deploy:
     needs: test
-    if: github.ref == 'refs/heads/main'
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,20 +66,29 @@ jobs:
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Notify Success on Slack
+      - name: Notify success on Slack
         if: success()
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
-            { "text": "🚀 *Deploy Succeeded!* Your app is live on Vercel." }
+            {
+              "text": "🚀 *Deploy Succeeded!* O chatbot está online na Vercel.",
+              "attachments": [{
+                "color": "good",
+                "fields": [
+                  { "title": "Project", "value": "chat-bot-project", "short": true },
+                  { "title": "Environment", "value": "Production", "short": true }
+                ]
+              }]
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Notify Failure on Slack
+      - name: Notify deploy failure on Slack
         if: failure()
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
-            { "text": "❌ *Deploy Failed!* Error during Vercel deployment." }
+            { "text": "⚠️ *Deploy Failed!* Ocorreu um erro ao subir para a Vercel." }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
