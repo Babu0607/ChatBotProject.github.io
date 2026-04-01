@@ -53,7 +53,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "${{ job.status == 'success' && '🚀 Deploy do Chatbot concluído com sucesso!' || '⚠️ Falha no Workflow do Chatbot' }}"
+              "text": "${{ job.status == 'success' && '🚀 Deploy Succeeded! Your app is live on Vercel.' || '⚠️ CI failed! Tests broke on job' }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
